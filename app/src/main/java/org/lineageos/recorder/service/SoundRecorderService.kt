@@ -129,24 +129,62 @@ class SoundRecorderService : LifecycleService() {
         super.onStartCommand(intent, flags, startId)
 
         return intent?.let {
-            when (it.action) {
-                ACTION_START -> it.getStringExtra(EXTRA_FILE_NAME)?.let { fileName ->
-                    if (startRecording(fileName)) {
-                        START_STICKY
-                    } else {
-                        START_NOT_STICKY
+                try {
+                    when (it.action) {
+                        ACTION_START -> {
+                            try {
+                                it.getStringExtra(EXTRA_FILE_NAME)?.let { fileName ->
+                                    try {
+                                        if (startRecording(fileName)) {
+                                            START_STICKY
+                                        } else {
+                                            START_NOT_STICKY
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.e(TAG, "Error in startRecording: ${e.message}", e)
+                                        START_NOT_STICKY
+                                    }
+                                } ?: START_NOT_STICKY
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error getting file name: ${e.message}", e)
+                                START_NOT_STICKY
+                            }
+                        }
+
+                        ACTION_STOP -> {
+                            try {
+                                if (stopRecording()) START_STICKY else START_NOT_STICKY
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error in stopRecording: ${e.message}", e)
+                                START_NOT_STICKY
+                            }
+                        }
+
+                        ACTION_PAUSE -> {
+                            try {
+                                if (pauseRecording()) START_STICKY else START_NOT_STICKY
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error in pauseRecording: ${e.message}", e)
+                                START_NOT_STICKY
+                            }
+                        }
+
+                        ACTION_RESUME -> {
+                            try {
+                                if (resumeRecording()) START_STICKY else START_NOT_STICKY
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error in resumeRecording: ${e.message}", e)
+                                START_NOT_STICKY
+                            }
+                        }
+
+                        else -> START_NOT_STICKY
                     }
-                } ?: START_NOT_STICKY
-
-                ACTION_STOP -> if (stopRecording()) START_STICKY else START_NOT_STICKY
-
-                ACTION_PAUSE -> if (pauseRecording()) START_STICKY else START_NOT_STICKY
-
-                ACTION_RESUME -> if (resumeRecording()) START_STICKY else START_NOT_STICKY
-
-                else -> START_NOT_STICKY
-            }
-        } ?: START_NOT_STICKY
+                } catch (e: Exception) {
+                    Log.e(TAG, "Unexpected error in service handling: ${e.message}", e)
+                    START_NOT_STICKY
+                }
+            } ?: START_NOT_STICKY
     }
 
     private fun startRecording(fileName: String): Boolean {
