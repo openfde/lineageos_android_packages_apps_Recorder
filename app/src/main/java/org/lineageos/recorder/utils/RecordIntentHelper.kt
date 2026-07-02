@@ -17,7 +17,7 @@ object RecordIntentHelper {
         intent.setType(mimeType)
         intent.putExtra(Intent.EXTRA_STREAM, uri)
         val chooserIntent = Intent.createChooser(intent, null)
-        chooserIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+        chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
         return chooserIntent
     }
 
@@ -30,7 +30,7 @@ object RecordIntentHelper {
             )
         )
         val chooserIntent = Intent.createChooser(intent, null)
-        chooserIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+        chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
         return chooserIntent
     }
 
